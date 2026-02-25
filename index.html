@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GEO-оптимизация для медицинских клиник — МедСпринт</title>
+  <meta name="description" content="МедСпринт — GEO-продвижение клиник в ChatGPT, Яндекс Нейро и Google AI. Бесплатный аудит: узнайте, что ИИ говорит о вашей клинике прямо сейчас." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & ROOT ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue:        #2388ed;
+      --blue-dark:   #0b5ed7;
+      --blue-deeper: #0a3f8f;
+      --navy:        #0c1f4a;
+      --bg:          #060810;
+      --bg-alt:      #0a0f1e;
+      --text:        #f1f5f9;
+      --muted:       #94a3b8;
+      --cyan:        #00d4ff;
+      --violet:      #7c3aed;
+      --success:     #10b981;
+      --card-bg:     rgba(255,255,255,0.04);
+      --card-border: rgba(255,255,255,0.08);
+      --glow-blue:   0 0 24px rgba(35,136,237,0.45), 0 0 48px rgba(35,136,237,0.2);
+      --glow-cyan:   0 0 24px rgba(0,212,255,0.4),  0 0 48px rgba(0,212,255,0.15);
+      --radius:      16px;
+      --radius-lg:   24px;
+      --transition:  0.3s ease;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      line-height: 1.65;
+    }
+    h1,h2,h3,h4 { font-family: 'Space Grotesk', sans-serif; line-height: 1.15; font-weight: 700; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    section { position: relative; }
+
+    /* ─── UTILS ─── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(35,136,237,0.15); border: 1px solid rgba(35,136,237,0.3);
+      color: var(--cyan); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; padding: 5px 12px; border-radius: 100px;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--cyan), var(--blue));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .section-label {
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 12px;
+    }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px; font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 600; padding: 14px 28px; border-radius: 12px;
+      border: none; cursor: pointer; transition: all var(--transition); white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--blue); color: #fff;
+      box-shadow: var(--glow-blue);
+    }
+    .btn-primary:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 0 36px rgba(35,136,237,0.65), 0 0 72px rgba(35,136,237,0.25); }
+    .btn-ghost {
+      background: transparent; color: var(--text);
+      border: 1.5px solid rgba(255,255,255,0.18);
+    }
+    .btn-ghost:hover { border-color: var(--cyan); color: var(--cyan); transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent; color: var(--blue);
+      border: 1.5px solid var(--blue);
+    }
+    .btn-outline:hover { background: rgba(35,136,237,0.1); transform: translateY(-2px); }
+    .btn svg { flex-shrink: 0; }
+
+    /* ─── GLASS CARD ─── */
+    .glass {
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px); border-radius: var(--radius-lg);
+    }
+    .glass:hover { border-color: rgba(35,136,237,0.25); background: rgba(35,136,237,0.04); }
+
+    /* ─── AURORA ─── */
+    .aurora-bg { position: relative; overflow: hidden; }
+    .aurora-bg::before, .aurora-bg::after { content: ''; position: absolute; border-radius: 50%; pointer-events: none; }
+    .aurora-bg::before {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(35,136,237,0.18) 0%, transparent 70%);
+      top: -250px; left: -200px;
+      animation: aurora 22s ease-in-out infinite;
+    }
+    .aurora-bg::after {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(124,58,237,0.14) 0%, transparent 70%);
+      bottom: -200px; right: -150px;
+      animation: aurora 28s ease-in-out infinite reverse;
+    }
+    @keyframes aurora {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(40px,-35px) scale(1.12); }
+      66%      { transform: translate(-25px,25px) scale(0.93); }
+    }
+
+    /* ─── SCROLL ANIMATION ─── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ════════════════════════════════════
+       0. NAVBAR
+    ════════════════════════════════════ */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      backdrop-filter: blur(20px); background: rgba(6,8,16,0.85);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background var(--transition);
+    }
+    .navbar-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; padding: 0 24px; max-width: 1200px; margin: 0 auto;
+    }
+    .navbar-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.15rem;
+    }
+    .navbar-logo-icon {
+      width: 36px; height: 36px; background: var(--blue); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; color: #fff; box-shadow: var(--glow-blue);
+    }
+    .logo-geo-tag {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      background: rgba(0,212,255,0.15); border: 1px solid rgba(0,212,255,0.35);
+      color: var(--cyan); padding: 2px 7px; border-radius: 6px; text-transform: uppercase;
+    }
+    .navbar-right { display: flex; align-items: center; gap: 16px; }
+    .navbar-phone { color: var(--muted); font-size: 0.9rem; font-weight: 500; }
+    .navbar-phone:hover { color: var(--text); }
+    .navbar .btn { padding: 9px 20px; font-size: 0.88rem; }
+    @media (max-width: 640px) {
+      .navbar-phone { display: none; }
+      .navbar .btn { padding: 9px 16px; font-size: 0.82rem; }
+    }
+
+    /* ════════════════════════════════════
+       1. HERO
+    ════════════════════════════════════ */
+    .hero {
+      min-height: 100vh; display: flex; align-items: center;
+      padding: 120px 0 80px; overflow: hidden;
+    }
+    .hero-inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .hero-eyebrow { margin-bottom: 20px; }
+    .hero h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.6rem); margin-bottom: 24px;
+      letter-spacing: -0.02em;
+    }
+    .hero-rotating-word {
+      display: inline-block; min-width: 240px;
+      background: linear-gradient(135deg, var(--cyan), #4da6ff);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      transition: opacity 0.3s ease;
+    }
+    .hero-rotating-word.fade-out { opacity: 0; }
+    .hero-sub {
+      font-size: clamp(1rem, 1.6vw, 1.15rem); color: var(--muted);
+      margin-bottom: 16px; line-height: 1.7; max-width: 500px;
+    }
+    .hero-spec {
+      font-size: 0.82rem; color: var(--muted); margin-bottom: 36px;
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .hero-spec span { color: var(--cyan); }
+    .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+    .hero-cta-note { font-size: 0.78rem; color: var(--muted); }
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 40px; padding-top: 32px;
+      border-top: 1px solid var(--card-border); flex-wrap: wrap;
+    }
+    .hero-stat-num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.75rem; font-weight: 700;
+      color: var(--text);
+    }
+    .hero-stat-num span { color: var(--cyan); }
+    .hero-stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+
+    /* ChatGPT Mock */
+    .hero-visual { position: relative; }
+    .chatgpt-mock {
+      background: #1a1a2e; border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg); overflow: hidden;
+      box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(35,136,237,0.15);
+    }
+    .mock-header {
+      background: #111122; padding: 14px 20px;
+      display: flex; align-items: center; gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .mock-dots { display: flex; gap: 6px; }
+    .mock-dots span {
+      width: 12px; height: 12px; border-radius: 50%;
+    }
+    .mock-dots span:nth-child(1) { background: #ff5f57; }
+    .mock-dots span:nth-child(2) { background: #ffbd2e; }
+    .mock-dots span:nth-child(3) { background: #28c940; }
+    .mock-title { font-size: 0.8rem; color: var(--muted); margin-left: 8px; }
+    .mock-body { padding: 20px; }
+    .mock-question {
+      background: rgba(35,136,237,0.12); border: 1px solid rgba(35,136,237,0.2);
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
+      font-size: 0.88rem; color: var(--text);
+    }
+    .mock-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.05em; }
+    .mock-answer { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+    .mock-highlight {
+      background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(35,136,237,0.2));
+      border: 1px solid rgba(0,212,255,0.3);
+      color: var(--cyan); border-radius: 8px; padding: 8px 12px;
+      margin-top: 12px; font-size: 0.82rem; font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .mock-badge {
+      position: absolute; top: -12px; right: 24px;
+      background: var(--success); color: #fff; font-size: 0.72rem; font-weight: 700;
+      padding: 5px 12px; border-radius: 100px; letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; gap: 48px; }
+      .hero-visual { order: -1; max-width: 520px; margin: 0 auto; width: 100%; }
+      .hero h1 { font-size: clamp(1.9rem, 6vw, 2.8rem); }
+    }
+    @media (max-width: 640px) {
+      .hero { padding: 100px 0 60px; }
+      .hero-stats { gap: 20px; }
+    }
+
+    /* ════════════════════════════════════
+       2. MARQUEE
+    ════════════════════════════════════ */
+    .marquee-section {
+      padding: 24px 0; background: var(--bg-alt);
+      border-top: 1px solid var(--card-border); border-bottom: 1px solid var(--card-border);
+      overflow: hidden;
+    }
+    .marquee-row { overflow: hidden; white-space: nowrap; margin: 6px 0; }
+    .marquee-track {
+      display: inline-flex; align-items: center; gap: 0;
+      animation: marquee-scroll 30s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-row:nth-child(2) .marquee-track { animation-direction: reverse; }
+    .marquee-track:hover { animation-play-state: paused; }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 0.88rem; color: var(--muted); font-weight: 500;
+      padding: 0 28px; border-right: 1px solid var(--card-border);
+    }
+    .marquee-item svg { color: var(--cyan); opacity: 0.7; flex-shrink: 0; }
+    @keyframes marquee-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ════════════════════════════════════
+       3. PROBLEM
+    ════════════════════════════════════ */
+    .problem { padding: 100px 0; background: var(--bg-alt); }
+    .problem h2 {
+      font-size: clamp(1.7rem, 3.5vw, 2.6rem); margin-bottom: 20px;
+      max-width: 700px;
+    }
+    .problem-intro { font-size: 1.05rem; color: var(--muted); max-width: 680px; margin-bottom: 56px; line-height: 1.75; }
+    .problem-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 48px;
+    }
+    .problem-card {
+      padding: 28px; border-radius: var(--radius-lg); transition: all var(--transition);
+    }
+    .problem-card:hover { transform: translateY(-4px); }
+    .problem-icon { font-size: 2rem; margin-bottom: 16px; }
+    .problem-stat {
+      font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700;
+      color: var(--text); margin-bottom: 8px; line-height: 1;
+    }
+    .problem-stat strong { color: var(--cyan); }
+    .problem-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+    .problem-source { font-size: 0.72rem; color: rgba(148,163,184,0.5); margin-top: 8px; }
+    .problem-conclusion {
+      background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2);
+      border-radius: var(--radius-lg); padding: 24px 28px;
+      font-size: 1rem; color: var(--muted); line-height: 1.7;
+    }
+    .problem-conclusion strong { color: var(--text); }
+    @media (max-width: 640px) {
+      .problem-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ════════════════════════════════════
+       4. SOLUTION
+    ════════════════════════════════════ */
+    .solution { padding: 100px 0; }
+    .solution h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); margin-bottom: 20px; max-width: 700px; }
+    .solution-intro { font-size: 1.05rem; color: var(--muted); max-width: 660px; margin-bottom: 60px; line-height: 1.75; }
+
+    .how-works {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; margin-bottom: 64px;
+      position: relative;
+    }
+    .how-works::before {
+      content: ''; position: absolute; top: 36px; left: 16.6%; right: 16.6%; height: 2px;
+      background: linear-gradient(90deg, var(--blue), var(--cyan));
+      z-index: 0;
+    }
+    .how-step { text-align: center; padding: 0 20px; position: relative; z-index: 1; }
+    .how-num {
+      width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; font-weight: 700;
+      background: var(--bg-alt); border: 2px solid var(--blue);
+      box-shadow: var(--glow-blue);
+    }
+    .how-title { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    .how-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+    .how-query { font-style: italic; color: var(--cyan); font-size: 0.82rem; margin-top: 8px; }
+
+    .comparison-table {
+      width: 100%; border-collapse: collapse; border-radius: var(--radius-lg); overflow: hidden;
+    }
+    .comparison-table thead tr { background: var(--bg-alt); }
+    .comparison-table th {
+      padding: 16px 20px; text-align: left; font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem; font-weight: 600; color: var(--muted);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .comparison-table th:nth-child(3) { color: var(--cyan); }
+    .comparison-table td {
+      padding: 16px 20px; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .comparison-table td:first-child { color: var(--muted); font-weight: 500; }
+    .comparison-table td:last-child { color: var(--text); }
+    .comparison-table tbody tr { transition: background var(--transition); }
+    .comparison-table tbody tr:hover { background: rgba(35,136,237,0.04); }
+    .comparison-table tbody tr:last-child td { border-bottom: none; }
+    .comparison-wrap { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); overflow: hidden; }
+
+    @media (max-width: 640px) {
+      .how-works { grid-template-columns: 1fr; gap: 32px; }
+      .how-works::before { display: none; }
+      .comparison-table { font-size: 0.82rem; }
+      .comparison-table th, .comparison-table td { padding: 12px 14px; }
+    }
+
+    /* ════════════════════════════════════
+       5. SERVICES — BENTO GRID
+    ════════════════════════════════════ */
+    .services { padding: 100px 0; background: var(--bg-alt); }
+    .services h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); margin-bottom: 48px; }
+    .bento {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      grid-template-rows: auto auto; gap: 16px;
+    }
+    .bento-card {
+      padding: 28px; border-radius: var(--radius-lg); transition: all var(--transition);
+      display: flex; flex-direction: column;
+    }
+    .bento-card:hover { transform: translateY(-4px); border-color: rgba(35,136,237,0.3); }
+    .bento-card.large { grid-column: span 2; grid-row: span 2; }
+    .bento-card.wide  { grid-column: span 2; }
+    .bento-icon { font-size: 2rem; margin-bottom: 16px; }
+    .bento-title {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .bento-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.65; flex: 1; }
+    .bento-badge {
+      display: inline-block; margin-top: 20px; padding: 6px 14px;
+      background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3);
+      color: var(--success); font-size: 0.78rem; font-weight: 600; border-radius: 100px;
+    }
+    .bento-card.large .bento-title { font-size: 1.4rem; margin-bottom: 14px; }
+    .bento-card.large .bento-desc { font-size: 0.95rem; }
+    .bento-visual {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      margin-top: 24px;
+    }
+    .bento-chart {
+      width: 100%; height: 80px; display: flex; align-items: flex-end; gap: 6px;
+    }
+    .chart-bar {
+      flex: 1; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, var(--cyan), var(--blue));
+      opacity: 0.7; animation: bar-grow 1.5s ease forwards;
+    }
+    @keyframes bar-grow { from { height: 0 !important; } }
+    @media (max-width: 900px) {
+      .bento { grid-template-columns: repeat(2, 1fr); }
+      .bento-card.large { grid-column: span 2; grid-row: span 1; }
+    }
+    @media (max-width: 640px) {
+      .bento { grid-template-columns: 1fr; }
+      .bento-card.large, .bento-card.wide { grid-column: span 1; }
+    }
+
+    /* ════════════════════════════════════
+       6. CASES
+    ════════════════════════════════════ */
+    .cases { padding: 100px 0; }
+    .cases h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); margin-bottom: 48px; }
+    .cases-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+    .case-card { padding: 32px; border-radius: var(--radius-lg); transition: all var(--transition); }
+    .case-card:hover { transform: translateY(-4px); }
+    .case-type {
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--cyan); margin-bottom: 8px;
+    }
+    .case-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 16px; }
+    .case-task { font-size: 0.88rem; color: var(--muted); margin-bottom: 20px; line-height: 1.65; }
+    .case-metrics { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+    .case-metric-num {
+      font-family: 'Space Grotesk', sans-serif; font-size: 1.6rem; font-weight: 700; color: var(--success);
+    }
+    .case-metric-label { font-size: 0.78rem; color: var(--muted); }
+    .case-before-after {
+      background: rgba(255,255,255,0.03); border: 1px solid var(--card-border);
+      border-radius: var(--radius); padding: 16px; font-size: 0.82rem;
+      display: grid; grid-template-columns: 1fr auto 1fr; gap: 12px; align-items: center;
+    }
+    .case-before { color: rgba(148,163,184,0.6); }
+    .case-arrow { color: var(--cyan); font-size: 1.2rem; text-align: center; }
+    .case-after { color: var(--success); font-weight: 500; }
+    .case-placeholder {
+      width: 100%; height: 100px; border-radius: var(--radius);
+      background: rgba(35,136,237,0.06); border: 1px dashed rgba(35,136,237,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; color: var(--muted); margin-top: 16px;
+    }
+    @media (max-width: 768px) { .cases-grid { grid-template-columns: 1fr; } }
+
+    /* ════════════════════════════════════
+       7. MID CTA
+    ════════════════════════════════════ */
+    .mid-cta { padding: 80px 0; background: var(--bg-alt); }
+    .mid-cta-label { margin-bottom: 32px; text-align: center; }
+    .mid-cta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .mid-cta-card { padding: 36px; border-radius: var(--radius-lg); text-align: center; transition: all var(--transition); }
+    .mid-cta-card:hover { transform: translateY(-4px); }
+    .mid-cta-icon { font-size: 2.5rem; margin-bottom: 16px; }
+    .mid-cta-card h3 { font-size: 1.2rem; margin-bottom: 12px; }
+    .mid-cta-card p { font-size: 0.9rem; color: var(--muted); margin-bottom: 24px; line-height: 1.65; }
+    .mid-cta-note { font-size: 0.75rem; color: var(--muted); margin-top: 10px; }
+    .mid-cta-top { text-align: center; margin-bottom: 24px; }
+    .mid-cta-top p { color: var(--muted); font-size: 0.88rem; margin-top: 8px; }
+    @media (max-width: 640px) { .mid-cta-grid { grid-template-columns: 1fr; } }
+
+    /* ════════════════════════════════════
+       8. PROCESS
+    ════════════════════════════════════ */
+    .process { padding: 100px 0; }
+    .process h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); margin-bottom: 56px; }
+    .timeline { position: relative; padding-left: 40px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 18px; top: 8px; bottom: 8px; width: 2px;
+      background: linear-gradient(180deg, var(--blue), var(--cyan), transparent);
+    }
+    .timeline-step { position: relative; margin-bottom: 40px; }
+    .timeline-step:last-child { margin-bottom: 0; }
+    .timeline-dot {
+      position: absolute; left: -40px; top: 4px;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--bg); border: 2px solid var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Space Grotesk', sans-serif; font-size: 0.85rem; font-weight: 700; color: var(--blue);
+      box-shadow: var(--glow-blue);
+    }
+    .timeline-period { font-size: 0.78rem; color: var(--cyan); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; }
+    .timeline-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.1rem; font-weight: 600; margin-bottom: 8px; }
+    .timeline-desc { font-size: 0.9rem; color: var(--muted); line-height: 1.65; max-width: 560px; }
+
+    /* ════════════════════════════════════
+       9. TEAM
+    ════════════════════════════════════ */
+    .team { padding: 100px 0; background: var(--bg-alt); }
+    .team h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); margin-bottom: 16px; }
+    .team-intro { font-size: 1rem; color: var(--muted); max-width: 600px; margin-bottom: 48px; line-height: 1.7; }
+    .team-facts { display: flex; gap: 40px; flex-wrap: wrap; margin-bottom: 56px; }
+    .team-fact-num { font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; font-weight: 700; }
+    .team-fact-num span { color: var(--cyan); }
+    .team-fact-label { font-size: 0.82rem; color: var(--muted); }
+    .team-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .team-card { padding: 24px; border-radius: var(--radius-lg); text-align: center; transition: all var(--transition); }
+    .team-card:hover { transform: translateY(-4px); }
+    .team-avatar {
+      width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 14px;
+      display: flex; align-items: center; justify-content: center; font-size: 1.8rem;
+      border: 2px solid var(--card-border);
+    }
+    .team-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+    .team-role { font-size: 0.78rem; color: var(--cyan); font-weight: 500; }
+    .team-quote {
+      margin-top: 48px; padding: 28px; border-radius: var(--radius-lg);
+      border-left: 3px solid var(--blue); background: rgba(35,136,237,0.05);
+      font-size: 1rem; color: var(--muted); line-height: 1.75;
+    }
+    .team-quote cite { display: block; margin-top: 14px; font-style: normal; font-weight: 600; color: var(--text); font-size: 0.88rem; }
+    @media (max-width: 900px) { .team-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .team-grid { grid-template-columns: 1fr 1fr; } .team-facts { gap: 24px; } }
+
+    /* ════════════════════════════════════
+       10. TESTIMONIALS
+    ════════════════════════════════════ */
+    .testimonials { padding: 100px 0; }
+    .testimonials h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); margin-bottom: 48px; }
+    .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .review-card { padding: 28px; border-radius: var(--radius-lg); transition: all var(--transition); }
+    .review-card:hover { transform: translateY(-4px); }
+    .review-stars { color: #fbbf24; font-size: 0.9rem; margin-bottom: 16px; letter-spacing: 2px; }
+    .review-text { font-size: 0.9rem; color: var(--muted); line-height: 1.7; margin-bottom: 20px; }
+    .review-author { display: flex; align-items: center; gap: 12px; }
+    .review-avatar {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+      background: rgba(35,136,237,0.12); border: 1px solid rgba(35,136,237,0.2);
+    }
+    .review-name { font-family: 'Space Grotesk', sans-serif; font-size: 0.9rem; font-weight: 600; }
+    .review-role { font-size: 0.75rem; color: var(--muted); }
+    @media (max-width: 900px) { .reviews-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .reviews-grid { grid-template-columns: 1fr; } }
+
+    /* ════════════════════════════════════
+       11. FAQ
+    ════════════════════════════════════ */
+    .faq { padding: 100px 0; background: var(--bg-alt); }
+    .faq h2 { font-size: clamp(1.7rem, 3.5vw, 2.6rem); margin-bottom: 48px; }
+    .faq-list { max-width: 800px; display: flex; flex-direction: column; gap: 8px; }
+    .faq-item {
+      border: 1px solid var(--card-border); border-radius: var(--radius-lg);
+      overflow: hidden; transition: border-color var(--transition);
+    }
+    .faq-item.open { border-color: rgba(35,136,237,0.3); }
+    .faq-q {
+      width: 100%; background: none; border: none; cursor: pointer; text-align: left;
+      padding: 20px 24px; display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; color: var(--text);
+      font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600;
+    }
+    .faq-q:hover { color: var(--cyan); }
+    .faq-chevron {
+      flex-shrink: 0; transition: transform var(--transition); font-size: 1.2rem; color: var(--muted);
+    }
+    .faq-item.open .faq-chevron { transform: rotate(45deg); color: var(--cyan); }
+    .faq-a {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease, padding 0.3s ease;
+      font-size: 0.9rem; color: var(--muted); line-height: 1.75;
+    }
+    .faq-item.open .faq-a { max-height: 300px; }
+    .faq-a-inner { padding: 0 24px 20px; }
+
+    /* ════════════════════════════════════
+       12. FINAL CTA
+    ════════════════════════════════════ */
+    .final-cta { padding: 100px 0; }
+    .final-cta-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+    .final-cta h2 { font-size: clamp(1.8rem, 3.8vw, 2.8rem); margin-bottom: 16px; }
+    .final-cta-sub { font-size: 1rem; color: var(--muted); margin-bottom: 56px; }
+    .final-cta-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 32px; align-items: start; }
+    .cta-form-block { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 36px; text-align: left; }
+    .cta-form-block h3 { font-size: 1.1rem; margin-bottom: 24px; }
+    .form-field { margin-bottom: 16px; }
+    .form-field input {
+      width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--card-border);
+      border-radius: 10px; padding: 13px 16px; color: var(--text); font-size: 0.95rem; font-family: 'Inter', sans-serif;
+      outline: none; transition: border-color var(--transition);
+    }
+    .form-field input::placeholder { color: var(--muted); }
+    .form-field input:focus { border-color: var(--blue); background: rgba(35,136,237,0.05); }
+    .form-submit { width: 100%; }
+    .form-note { font-size: 0.75rem; color: var(--muted); margin-top: 12px; text-align: center; }
+    .cta-divider {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; color: var(--muted); font-size: 0.82rem; padding-top: 80px;
+    }
+    .cta-divider-line { width: 1px; height: 60px; background: var(--card-border); }
+    .cta-consult-block { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-lg); padding: 36px; text-align: left; }
+    .cta-consult-block h3 { font-size: 1.1rem; margin-bottom: 12px; }
+    .cta-consult-block p { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin-bottom: 24px; }
+    .cta-channels { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+    .cta-channel {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 16px; border-radius: 10px; font-size: 0.85rem; font-weight: 500;
+      border: 1px solid var(--card-border); color: var(--muted); transition: all var(--transition);
+    }
+    .cta-channel:hover { border-color: var(--blue); color: var(--text); }
+    @media (max-width: 900px) {
+      .final-cta-grid { grid-template-columns: 1fr; }
+      .cta-divider { flex-direction: row; padding-top: 0; }
+      .cta-divider-line { width: 60px; height: 1px; }
+    }
+
+    /* ════════════════════════════════════
+       FOOTER
+    ════════════════════════════════════ */
+    .footer {
+      background: var(--bg-alt); border-top: 1px solid var(--card-border);
+      padding: 48px 0 32px;
+    }
+    .footer-inner { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+    .footer-brand p { font-size: 0.85rem; color: var(--muted); margin-top: 12px; max-width: 260px; line-height: 1.6; }
+    .footer-col h4 { font-size: 0.85rem; font-weight: 600; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 0.88rem; color: var(--muted); margin-bottom: 8px; transition: color var(--transition); }
+    .footer-col a:hover { color: var(--text); }
+    .footer-bottom {
+      border-top: 1px solid var(--card-border); padding-top: 24px;
+      display: flex; justify-content: space-between; align-items: center; flex-wrap: gap;
+      font-size: 0.78rem; color: var(--muted);
+    }
+    .footer-bottom a { color: var(--muted); }
+    .footer-bottom a:hover { color: var(--text); }
+    @media (max-width: 900px) { .footer-inner { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .footer-inner { grid-template-columns: 1fr; gap: 28px; } .footer-bottom { flex-direction: column; gap: 8px; text-align: center; } }
+
+    /* ─── MISC ─── */
+    .section-heading { margin-bottom: 48px; }
+    .section-heading h2 { margin-top: 8px; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a href="https://medsprint.ru" class="navbar-logo">
+      <div class="navbar-logo-icon">М</div>
+      МедСпринт
+      <span class="logo-geo-tag">GEO</span>
+    </a>
+    <div class="navbar-right">
+      <a href="tel:+74951234567" class="navbar-phone">+7 (495) 123-45-67</a>
+      <a href="#cta" class="btn btn-primary">Получить аудит</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════ HERO ══════════════════ -->
+<section class="hero aurora-bg" id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span class="tag">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M6 3v3l2 2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            Для медицинских клиник · Россия
+          </span>
+        </div>
+        <h1 class="reveal">
+          Ваша клиника<br>в ответах<br>
+          <span class="hero-rotating-word" id="rotatingWord">ChatGPT</span>
+        </h1>
+        <p class="hero-sub reveal">
+          Пока конкуренты оптимизируют сайты под поисковики — пациенты уже спрашивают ИИ. МедСпринт делает так, чтобы ИИ называл вашу клинику первой.
+        </p>
+        <p class="hero-spec reveal">
+          <span>★</span> Специализируемся только на медицине &nbsp;·&nbsp; 13 лет в медицинском маркетинге
+        </p>
+        <div class="hero-ctas reveal">
+          <a href="#cta" class="btn btn-primary">Получить бесплатный GEO-аудит</a>
+          <a href="https://t.me/medsprint_geo_bot" target="_blank" class="btn btn-ghost">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+            Проверить в Telegram →
+          </a>
+        </div>
+        <p class="hero-cta-note reveal">Аудит — за 48 часов. Telegram — за 2 минуты. Оба бесплатно.</p>
+        <div class="hero-stats reveal">
+          <div>
+            <div class="hero-stat-num"><span class="count" data-target="360">0</span>+</div>
+            <div class="hero-stat-label">проектов в медицине</div>
+          </div>
+          <div>
+            <div class="hero-stat-num"><span class="count" data-target="13">0</span></div>
+            <div class="hero-stat-label">лет экспертизы</div>
+          </div>
+          <div>
+            <div class="hero-stat-num"><span>с 2024</span></div>
+            <div class="hero-stat-label">GEO для клиник</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ChatGPT Mock -->
+      <div class="hero-visual reveal">
+        <div style="position:relative;">
+          <span class="mock-badge">✓ Реальный ответ ChatGPT</span>
+          <div class="chatgpt-mock">
+            <div class="mock-header">
+              <div class="mock-dots">
+                <span></span><span></span><span></span>
+              </div>
+              <span class="mock-title">ChatGPT — новый разговор</span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-question">
+                <div class="mock-label">ВЫ СПРАШИВАЕТЕ</div>
+                💬 Какая клиника в Москве лечит варикоз лучше всего?
+              </div>
+              <div class="mock-label">ОТВЕТ ChatGPT</div>
+              <div class="mock-answer">
+                По данным из медицинских источников, для лечения варикоза в Москве рекомендуются следующие клиники:<br><br>
+                <strong style="color:var(--text)">1. Клиника «Альфа-Мед»</strong> — специализированный флебологический центр с современным оборудованием. Врачи активно публикуют материалы о методах лечения...
+              </div>
+              <div class="mock-highlight">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/></svg>
+                Ваша клиника упоминается в ТОП-3 ответов ИИ
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ MARQUEE ══════════════════ -->
+<div class="marquee-section">
+  <div class="marquee-row">
+    <div class="marquee-track" id="track1">
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Стоматологии</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Косметологические клиники</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Репродуктологические центры</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Офтальмологические клиники</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Медицинские холдинги</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Ортопедические центры</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Психотерапевтические практики</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Многопрофильные медцентры</span>
+      <!-- дублируем для бесшовности -->
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Стоматологии</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Косметологические клиники</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Репродуктологические центры</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Офтальмологические клиники</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Медицинские холдинги</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Ортопедические центры</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Психотерапевтические практики</span>
+      <span class="marquee-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="currentColor" stroke-width="2"/></svg>Многопрофильные медцентры</span>
+    </div>
+  </div>
+  <div class="marquee-row">
+    <div class="marquee-track">
+      <span class="marquee-item" style="color:var(--cyan);">ChatGPT</span>
+      <span class="marquee-item">Яндекс Нейро</span>
+      <span class="marquee-item" style="color:var(--cyan);">Perplexity AI</span>
+      <span class="marquee-item">Google AI Overviews</span>
+      <span class="marquee-item" style="color:var(--cyan);">Claude</span>
+      <span class="marquee-item">Grok</span>
+      <span class="marquee-item" style="color:var(--cyan);">Gemini</span>
+      <span class="marquee-item">DeepSeek</span>
+      <span class="marquee-item" style="color:var(--cyan);">ChatGPT</span>
+      <span class="marquee-item">Яндекс Нейро</span>
+      <span class="marquee-item" style="color:var(--cyan);">Perplexity AI</span>
+      <span class="marquee-item">Google AI Overviews</span>
+      <span class="marquee-item" style="color:var(--cyan);">Claude</span>
+      <span class="marquee-item">Grok</span>
+      <span class="marquee-item" style="color:var(--cyan);">Gemini</span>
+      <span class="marquee-item">DeepSeek</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PROBLEM ══════════════════ -->
+<section class="problem" id="problem">
+  <div class="container">
+    <div class="section-heading reveal">
+      <div class="section-label">Проблема</div>
+      <h2>SEO умирает. ИИ забирает ваш трафик — прямо сейчас.</h2>
+    </div>
+    <p class="problem-intro reveal">
+      Ещё два года назад пациент вводил запрос в поисковик и видел список сайтов. Сегодня он спрашивает ChatGPT: «Какая клиника лучше всего лечит варикоз в Москве?» — и получает конкретный ответ с именами. Без перехода на ваш сайт.
+    </p>
+    <div class="problem-grid">
+      <div class="glass problem-card reveal">
+        <div class="problem-icon">📉</div>
+        <div class="problem-stat"><strong>84%</strong></div>
+        <div class="problem-desc">медицинских запросов получают AI Overview в Google — без перехода на сайт</div>
+        <div class="problem-source">BrightEdge Research, 2025</div>
+      </div>
+      <div class="glass problem-card reveal">
+        <div class="problem-icon">🤖</div>
+        <div class="problem-stat"><strong>200 млн</strong></div>
+        <div class="problem-desc">активных пользователей ChatGPT в неделю. Большинство клиник в их ответах не упоминаются</div>
+        <div class="problem-source">OpenAI, 2025</div>
+      </div>
+      <div class="glass problem-card reveal">
+        <div class="problem-icon">⚡</div>
+        <div class="problem-stat"><strong>−25%</strong></div>
+        <div class="problem-desc">поискового трафика потеряют сайты к 2026 году из-за ИИ-ответов вместо синих ссылок</div>
+        <div class="problem-source">Gartner, 2024</div>
+      </div>
+      <div class="glass problem-card reveal">
+        <div class="problem-icon">🏥</div>
+        <div class="problem-stat"><strong>61%</strong></div>
+        <div class="problem-desc">пациентов уже используют ИИ-инструменты для получения медицинской информации</div>
+        <div class="problem-source">Stanford Medicine, 2024</div>
+      </div>
+    </div>
+    <div class="problem-conclusion reveal">
+      <strong>Традиционное SEO оптимизировало под алгоритм ранжирования.</strong> GEO оптимизирует под то, как ИИ выбирает источники для цитирования. Это принципиально разные механики — и именно здесь сейчас пустая ниша для вашей клиники.
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ SOLUTION ══════════════════ -->
+<section class="solution" id="solution">
+  <div class="container">
+    <div class="section-heading reveal">
+      <div class="section-label">Решение</div>
+      <h2>GEO — SEO следующего поколения. Мы делаем ваш контент тем, что ИИ хочет цитировать.</h2>
+    </div>
+    <p class="solution-intro reveal">
+      GEO — комплекс работ, который делает ваш сайт понятным и авторитетным источником для ИИ-систем. В отличие от SEO, здесь нет гонки за позициями — важно одно: чтобы ChatGPT и Яндекс Нейро выбрали именно ваш контент для ответа пациенту. МедСпринт знает, как это работает в медицине.
+    </p>
+
+    <div class="how-works reveal">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-title">Пациент спрашивает ИИ</div>
+        <div class="how-query">«Какой кардиолог лучший в Казани?»</div>
+        <div class="how-desc" style="margin-top:8px;">ИИ-помощники ежедневно отвечают на миллионы медицинских запросов</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-title">ИИ выбирает источники</div>
+        <div class="how-desc">Алгоритм оценивает достоверность, структуру, авторитетность и E-E-A-T контента</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-title">Ваша клиника в ответе</div>
+        <div class="how-query">«Рекомендую обратиться в клинику X...»</div>
+        <div class="how-desc" style="margin-top:8px;">Пациент доверяет ответу ИИ больше, чем рекламному объявлению</div>
+      </div>
+    </div>
+
+    <div class="comparison-wrap reveal">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Параметр</th>
+            <th>Обычный SEO</th>
+            <th>GEO — МедСпринт</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Цель</td><td>Позиция в поисковой выдаче</td><td>Упоминание в ИИ-ответе</td></tr>
+          <tr><td>Пациент видит</td><td>Список ссылок</td><td>Готовый ответ с именем вашей клиники</td></tr>
+          <tr><td>Измеряем</td><td>Позиции, CTR, трафик</td><td>AI Citation Rate — частота упоминаний</td></tr>
+          <tr><td>Контент</td><td>Ключевые слова</td><td>Авторитетность, факты, структура</td></tr>
+          <tr><td>Конкуренция</td><td>Высокая, ниши заняты</td><td>Низкая — рынок только формируется</td></tr>
+          <tr><td>Специфика медицины</td><td>Общие алгоритмы</td><td>YMYL + E-E-A-T для здравоохранения</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ SERVICES ══════════════════ -->
+<section class="services" id="services">
+  <div class="container">
+    <div class="section-heading reveal">
+      <div class="section-label">Что входит</div>
+      <h2>Что входит в GEO-продвижение для клиники</h2>
+    </div>
+    <div class="bento">
+      <!-- Большая карточка -->
+      <div class="glass bento-card large reveal">
+        <div class="bento-icon">🔍</div>
+        <div class="bento-title">GEO-аудит</div>
+        <div class="bento-desc">Проверяем видимость вашей клиники в ChatGPT, Perplexity, Google AI Overview, Яндекс Нейро. Показываем скриншоты — что ИИ отвечает о вас прямо сейчас. Анализируем 40–100 целевых медицинских запросов вашего профиля и города.</div>
+        <div class="bento-badge">БЕСПЛАТНО для новых клиентов</div>
+        <div class="bento-visual">
+          <div class="bento-chart">
+            <div class="chart-bar" style="height:20%"></div>
+            <div class="chart-bar" style="height:35%"></div>
+            <div class="chart-bar" style="height:55%"></div>
+            <div class="chart-bar" style="height:45%"></div>
+            <div class="chart-bar" style="height:70%"></div>
+            <div class="chart-bar" style="height:65%"></div>
+            <div class="chart-bar" style="height:85%"></div>
+            <div class="chart-bar" style="height:90%"></div>
+          </div>
+        </div>
+      </div>
+      <!-- Широкая карточка -->
+      <div class="glass bento-card wide reveal">
+        <div class="bento-icon">✍️</div>
+        <div class="bento-title">Контент для ИИ</div>
+        <div class="bento-desc">Переформатируем существующие материалы и создаём новые — в формате, который ИИ предпочитает цитировать: FAQ-блоки, экспертные ответы, структурированные факты. Копирайтеры с медицинским образованием, верификация врачом.</div>
+      </div>
+      <!-- Маленькие карточки -->
+      <div class="glass bento-card reveal">
+        <div class="bento-icon">⚙️</div>
+        <div class="bento-title">Технический GEO</div>
+        <div class="bento-desc">Schema.org для медицинских организаций, врачей и услуг. FAQ-разметка. llms.txt. Структурированные данные.</div>
+      </div>
+      <div class="glass bento-card reveal">
+        <div class="bento-icon">🏆</div>
+        <div class="bento-title">E-E-A-T усиление</div>
+        <div class="bento-desc">Цифровой авторитет врачей: биографии, публикации, внешние упоминания, профессиональные профили.</div>
+      </div>
+      <!-- Широкая карточка -->
+      <div class="glass bento-card wide reveal">
+        <div class="bento-icon">📊</div>
+        <div class="bento-title">Мониторинг и отчётность</div>
+        <div class="bento-desc">Каждый месяц: какие запросы дают упоминания в ИИ, динамика роста, конкурентный анализ. AI Citation Rate как главная метрика — в цифрах, не в обещаниях. Скриншоты реальных ответов ИИ в каждом отчёте.</div>
+      </div>
+      <div class="glass bento-card reveal">
+        <div class="bento-icon">🩺</div>
+        <div class="bento-title">Медицинская специфика</div>
+        <div class="bento-desc">Знаем YMYL, E-E-A-T в здравоохранении, ограничения ФАС. Только медицина.</div>
+      </div>
+      <div class="glass bento-card reveal">
+        <div class="bento-icon">🔗</div>
+        <div class="bento-title">GEO-стратегия</div>
+        <div class="bento-desc">Ежемесячная аналитика, приоритизация запросов, корректировка под изменения алгоритмов ИИ.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ CASES ══════════════════ -->
+<section class="cases" id="cases">
+  <div class="container">
+    <div class="section-heading reveal">
+      <div class="section-label">Кейсы</div>
+      <h2>Как это работает на практике — в цифрах</h2>
+    </div>
+    <div class="cases-grid">
+      <div class="glass case-card reveal">
+        <div class="case-type">Многопрофильный медцентр · Москва</div>
+        <div class="case-title">От нулевого присутствия в ИИ до ТОП-3 рекомендаций за 3 месяца</div>
+        <div class="case-task">Клиника не упоминалась ни в одном ИИ-ответе по 40 целевым запросам. Весь трафик шёл через дорогой контекст (CPL 8 000–12 000 ₽).</div>
+        <div class="case-metrics">
+          <div>
+            <div class="case-metric-num">+340%</div>
+            <div class="case-metric-label">упоминания в Яндекс Нейро</div>
+          </div>
+          <div>
+            <div class="case-metric-num">+28%</div>
+            <div class="case-metric-label">органический трафик</div>
+          </div>
+          <div>
+            <div class="case-metric-num">+67%</div>
+            <div class="case-metric-label">брендовые запросы</div>
+          </div>
+        </div>
+        <div class="case-before-after">
+          <div class="case-before">❌ До: клиника не упоминается в ChatGPT</div>
+          <div class="case-arrow">→</div>
+          <div class="case-after">✓ После: ТОП-3 по 35 запросам</div>
+        </div>
+        <div class="case-placeholder">[ Скриншот: ответ ChatGPT до и после ]</div>
+      </div>
+
+      <div class="glass case-card reveal">
+        <div class="case-type">Стоматологическая клиника · Санкт-Петербург</div>
+        <div class="case-title">GEO-оптимизация для узкоспециализированной практики имплантации</div>
+        <div class="case-task">Небольшая клиника имплантации конкурировала с крупными сетями по контексту. Бюджет на рекламу ограничен, нужен другой канал.</div>
+        <div class="case-metrics">
+          <div>
+            <div class="case-metric-num">+500%</div>
+            <div class="case-metric-label">AI-трафик за 5 мес.</div>
+          </div>
+          <div>
+            <div class="case-metric-num">−40%</div>
+            <div class="case-metric-label">бюджет на контекст</div>
+          </div>
+          <div>
+            <div class="case-metric-num">×2.3</div>
+            <div class="case-metric-label">конверсия в запись</div>
+          </div>
+        </div>
+        <div class="case-before-after">
+          <div class="case-before">❌ 0 упоминаний в Perplexity</div>
+          <div class="case-arrow">→</div>
+          <div class="case-after">✓ Цитируется в 12 ответах/нед.</div>
+        </div>
+        <div class="case-placeholder">[ Скриншот: ответ Perplexity с упоминанием ]</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ MID CTA ══════════════════ -->
+<section class="mid-cta">
+  <div class="container">
+    <div class="mid-cta-top reveal">
+      <div class="section-label" style="text-align:center;">Первый шаг</div>
+      <p style="font-size:0.85rem;margin-top:8px;">🎯 Первые 10 аудитов в месяц — бесплатно</p>
+    </div>
+    <div class="mid-cta-grid">
+      <div class="glass mid-cta-card reveal">
+        <div class="mid-cta-icon">⚡</div>
+        <h3>Проверьте прямо сейчас — за 2 минуты</h3>
+        <p>Напишите нашему Telegram-боту название и город вашей клиники. Бот сделает реальный запрос в ChatGPT и пришлёт скриншот ответа — что ИИ говорит о вас прямо сейчас.</p>
+        <a href="https://t.me/medsprint_geo_bot" target="_blank" class="btn btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+          Проверить клинику в Telegram
+        </a>
+        <p class="mid-cta-note">Без регистрации. Результат сразу.</p>
+      </div>
+      <div class="glass mid-cta-card reveal">
+        <div class="mid-cta-icon">💬</div>
+        <h3>Поговорим — без давления и продажи в лоб</h3>
+        <p>Запишитесь на 30-минутную консультацию. Разберём вашу конкретную ситуацию, покажем примеры GEO для клиник вашей специализации. Zoom или звонок — на ваш выбор.</p>
+        <a href="#cta" class="btn btn-outline">Записаться на консультацию</a>
+        <p class="mid-cta-note">Выбираете удобное время. Отвечаем в рабочий день.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ PROCESS ══════════════════ -->
+<section class="process" id="process">
+  <div class="container" style="display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start;">
+    <div>
+      <div class="section-heading reveal">
+        <div class="section-label">Как мы работаем</div>
+        <h2>От первого звонка до упоминаний в ИИ — за 6 недель</h2>
+      </div>
+      <div class="timeline">
+        <div class="timeline-step reveal">
+          <div class="timeline-dot">1</div>
+          <div class="timeline-period">Неделя 1–2</div>
+          <div class="timeline-title">GEO-аудит</div>
+          <div class="timeline-desc">Проверяем видимость в ChatGPT, Perplexity, Google AI, Яндекс Нейро. Анализируем 40–100 целевых медзапросов. Смотрим конкурентов. Результат: отчёт со скриншотами.</div>
+        </div>
+        <div class="timeline-step reveal">
+          <div class="timeline-dot">2</div>
+          <div class="timeline-period">Неделя 3</div>
+          <div class="timeline-title">Стратегия и семантика</div>
+          <div class="timeline-desc">Карта ИИ-запросов — как пациенты формулируют вопросы для ChatGPT. Это принципиально отличается от SEO-семантики. Приоритизированный план работ.</div>
+        </div>
+        <div class="timeline-step reveal">
+          <div class="timeline-dot">3</div>
+          <div class="timeline-period">Недели 4–5</div>
+          <div class="timeline-title">Реализация</div>
+          <div class="timeline-desc">Schema.org для медорганизации, врачей, услуг. Переработка страниц под форматы ИИ. Новый контент с верификацией врача-консультанта.</div>
+        </div>
+        <div class="timeline-step reveal">
+          <div class="timeline-dot">4</div>
+          <div class="timeline-period">Неделя 6</div>
+          <div class="timeline-title">Первые результаты</div>
+          <div class="timeline-desc">Замеры AI Citation Rate. Скриншоты первых упоминаний. Корректировка стратегии по данным.</div>
+        </div>
+        <div class="timeline-step reveal">
+          <div class="timeline-dot">∞</div>
+          <div class="timeline-period">Ежемесячно</div>
+          <div class="timeline-title">Спринты и рост</div>
+          <div class="timeline-desc">Регулярные отчёты с метриками. Алгоритмы ИИ меняются — адаптируемся вместе. Ежемесячный план следующего спринта.</div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal">
+      <div class="glass" style="padding:32px;border-radius:var(--radius-lg);">
+        <div class="section-label" style="margin-bottom:20px;">Тарифы</div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div style="padding:20px;border-radius:var(--radius);border:1px solid var(--card-border);background:rgba(255,255,255,0.02);">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;margin-bottom:6px;">GEO Старт</div>
+            <div style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Аудит + базовая оптимизация + отчёт по 3 ИИ-системам</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;">35 000 — 55 000 ₽<span style="font-size:0.75rem;font-weight:400;color:var(--muted);">/мес</span></div>
+          </div>
+          <div style="padding:20px;border-radius:var(--radius);border:1px solid var(--blue);background:rgba(35,136,237,0.07);position:relative;">
+            <div style="position:absolute;top:-10px;left:20px;background:var(--blue);color:#fff;font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:0.05em;">ПОПУЛЯРНЫЙ</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;margin-bottom:6px;">GEO Рост</div>
+            <div style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Полная оптимизация + контент + мониторинг 5 систем</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;">70 000 — 100 000 ₽<span style="font-size:0.75rem;font-weight:400;color:var(--muted);">/мес</span></div>
+          </div>
+          <div style="padding:20px;border-radius:var(--radius);border:1px solid var(--card-border);background:rgba(255,255,255,0.02);">
+            <div style="font-family:'Space Grotesk',sans-serif;font-weight:600;margin-bottom:6px;">GEO Лидер</div>
+            <div style="font-size:0.85rem;color:var(--muted);margin-bottom:10px;">Комплекс + репутационный маркетинг + приоритет + SERM</div>
+            <div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;">от 130 000 ₽<span style="font-size:0.75rem;font-weight:400;color:var(--muted);">/мес</span></div>
+          </div>
+        </div>
+        <div style="margin-top:20px;font-size:0.78rem;color:var(--muted);">Договор с KPI. Результаты — в скриншотах, не в таблицах.</div>
+      </div>
+    </div>
+  </div>
+  <style>
+    @media (max-width: 900px) {
+      .process .container { grid-template-columns: 1fr !important; gap: 48px !important; }
+    }
+  </style>
+</section>
+
+<!-- ══════════════════ TEAM ══════════════════ -->
+<section class="team" id="team">
+  <div class="container">
+    <div class="section-heading reveal">
+      <div class="section-label">О нас</div>
+      <h2>Изучаем GEO с 2024 года — когда большинство агентств ещё не знали, что это такое</h2>
+    </div>
+    <p class="team-intro reveal">МедСпринт — агентство медицинского маркетинга с 13-летней специализацией. Знаем YMYL, ограничения ФАС, E-E-A-T в здравоохранении. Работаем только с медициной.</p>
+    <div class="team-facts reveal">
+      <div>
+        <div class="team-fact-num"><span class="count" data-target="360">0</span>+</div>
+        <div class="team-fact-label">проектов для клиник</div>
+      </div>
+      <div>
+        <div class="team-fact-num"><span class="count" data-target="13">0</span></div>
+        <div class="team-fact-label">лет в медицинском маркетинге</div>
+      </div>
+      <div>
+        <div class="team-fact-num"><span class="count" data-target="900">0</span>+</div>
+        <div class="team-fact-label">реализованных услуг</div>
+      </div>
+    </div>
+    <div class="team-grid">
+      <div class="glass team-card reveal">
+        <div class="team-avatar" style="background:rgba(35,136,237,0.12);border-color:rgba(35,136,237,0.2);">👨‍💼</div>
+        <div class="team-name">Алексей И.</div>
+        <div class="team-role">GEO-стратег</div>
+      </div>
+      <div class="glass team-card reveal">
+        <div class="team-avatar" style="background:rgba(0,212,255,0.1);border-color:rgba(0,212,255,0.2);">👩‍⚕️</div>
+        <div class="team-name">Мария К.</div>
+        <div class="team-role">Медицинский копирайтер</div>
+      </div>
+      <div class="glass team-card reveal">
+        <div class="team-avatar" style="background:rgba(124,58,237,0.12);border-color:rgba(124,58,237,0.2);">👨‍💻</div>
+        <div class="team-name">Дмитрий С.</div>
+        <div class="team-role">Технический специалист</div>
+      </div>
+      <div class="glass team-card reveal">
+        <div class="team-avatar" style="background:rgba(16,185,129,0.1);border-color:rgba(16,185,129,0.2);">👩‍💼</div>
+        <div class="team-name">Ольга Р.</div>
+        <div class="team-role">Project Manager</div>
+      </div>
+    </div>
+    <div class="team-quote glass reveal">
+      «Мы работаем с медициной 13 лет и видим: пациенты уже спрашивают ИИ, а большинство клиник об этом даже не думают. Это не тренд — это смена канала. Мы готовим клиентов к новой реальности.»
+      <cite>— Руководитель направления GEO, МедСпринт</cite>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ TESTIMONIALS ══════════════════ -->
+<section class="testimonials" id="reviews">
+  <div class="container">
+    <div class="section-heading reveal">
+      <div class="section-label">Отзывы</div>
+      <h2>Что говорят клиники, которые уже работают с нами</h2>
+    </div>
+    <div class="reviews-grid">
+      <div class="glass review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">«Скептически относились к GEO — казалось, очередной хайп. Через три месяца наш бренд начал появляться в ответах ChatGPT. Теперь получаем входящие от людей, которые нашли нас через ИИ.»</div>
+        <div class="review-author">
+          <div class="review-avatar">👩‍⚕️</div>
+          <div>
+            <div class="review-name">Елена В.</div>
+            <div class="review-role">Главный врач, косметологическая клиника, Москва</div>
+          </div>
+        </div>
+      </div>
+      <div class="glass review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">«Конкретные результаты в скриншотах — это то, чего не хватало от других подрядчиков. Каждый месяц вижу, как растёт число упоминаний в Яндекс Нейро. Договор с KPI — это честно.»</div>
+        <div class="review-author">
+          <div class="review-avatar">👨‍💼</div>
+          <div>
+            <div class="review-name">Андрей М.</div>
+            <div class="review-role">Директор по маркетингу, медицинский холдинг, СПб</div>
+          </div>
+        </div>
+      </div>
+      <div class="glass review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <div class="review-text">«Как небольшая стоматология мы не могли конкурировать с сетями по бюджету на рекламу. GEO дал нам другой канал — и теперь ChatGPT рекомендует нас по запросам имплантации в нашем районе.»</div>
+        <div class="review-author">
+          <div class="review-avatar">🦷</div>
+          <div>
+            <div class="review-name">Игорь Ш.</div>
+            <div class="review-role">Владелец стоматологии, Казань</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FAQ ══════════════════ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-heading reveal">
+      <div class="section-label">FAQ</div>
+      <h2>Частые вопросы</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item reveal">
+        <button class="faq-q">GEO вообще работает? Это не хайп?<span class="faq-chevron">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">ChatGPT обрабатывает 200 млн запросов в неделю. Google AI Overviews показываются в 84% медицинских запросов. Это не хайп — это изменение того, как люди ищут информацию. Наш аудит покажет вашу конкретную ситуацию — бесплатно.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Чем GEO отличается от SEO, которое мы уже делаем?<span class="faq-chevron">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">SEO оптимизирует под алгоритм ранжирования. GEO — под алгоритм выбора источников для ИИ-ответов. Разные механики, разные метрики, разные инструменты. Они дополняют друг друга — GEO усиливает SEO.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Как измерить результат?<span class="faq-chevron">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">AI Citation Rate — частота упоминания вашей клиники в ответах ChatGPT, Perplexity, Google AI Overview по целевым запросам. Ежемесячно присылаем отчёт со скриншотами реальных ответов ИИ.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Сколько времени до первых результатов?<span class="faq-chevron">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Первые измеримые изменения — 4–8 недель. Устойчивый рост — 3–6 месяцев. Первый отчёт со скриншотами ИИ-ответов — через 30 дней работы.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Можно совмещать с SEO?<span class="faq-chevron">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Да, и нужно. GEO усиливает SEO: структура контента, E-E-A-T, авторитетность работают в обоих направлениях. Если у вас уже есть SEO-подрядчик — скоординируемся.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Мы небольшая клиника — GEO нам подойдёт?<span class="faq-chevron">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Для небольших клиник GEO особенно выгоден: в ИИ-поисковиках нет гонки бюджетов. Авторитетный контент в нише даёт непропорционально большой эффект. Большой бюджет на контекст здесь не нужен.</div></div>
+      </div>
+      <div class="faq-item reveal">
+        <button class="faq-q">Что с YMYL и ограничениями медицинской рекламы?<span class="faq-chevron">+</span></button>
+        <div class="faq-a"><div class="faq-a-inner">Именно здесь и нужна специализация на медицине. Мы знаем требования ФАС к медицинской рекламе, понимаем, как ИИ оценивает YMYL-контент, и создаём материалы, которые одновременно соответствуют регуляторике и хорошо цитируются ИИ.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FINAL CTA ══════════════════ -->
+<section class="final-cta aurora-bg" id="cta">
+  <div class="container">
+    <div class="final-cta-inner">
+      <div class="reveal">
+        <div class="section-label" style="text-align:center;margin-bottom:12px;">Первый шаг</div>
+        <h2>Сделайте первый шаг — выберите удобный формат</h2>
+        <p class="final-cta-sub">Оба варианта бесплатны. Без предоплаты. Без давления.</p>
+      </div>
+      <div class="final-cta-grid reveal">
+        <div class="cta-form-block">
+          <h3>🔍 Бесплатный GEO-аудит</h3>
+          <p style="font-size:0.85rem;color:var(--muted);margin-bottom:20px;line-height:1.6;">За 48 часов проверим вашу клинику в ChatGPT, Яндекс Нейро и Perplexity — пришлём скриншоты реальных ответов ИИ.</p>
+          <form onsubmit="handleForm(event)">
+            <div class="form-field">
+              <input type="text" placeholder="Название клиники или ваше имя" required />
+            </div>
+            <div class="form-field">
+              <input type="tel" placeholder="Телефон или email" required />
+            </div>
+            <button type="submit" class="btn btn-primary form-submit">Получить бесплатный GEO-аудит</button>
+          </form>
+          <p class="form-note">Отвечаем в рабочий день. Без спама.</p>
+        </div>
+
+        <div class="cta-divider">
+          <div class="cta-divider-line"></div>
+          <span>или</span>
+          <div class="cta-divider-line"></div>
+        </div>
+
+        <div class="cta-consult-block">
+          <h3>💬 Консультация 30 минут</h3>
+          <p>Не готовы к аудиту — просто поговорим. Разберём вашу ситуацию, покажем реальные примеры GEO для клиник вашей специализации.</p>
+          <a href="https://t.me/medsprint" target="_blank" class="btn btn-outline" style="width:100%;justify-content:center;">Записаться на консультацию →</a>
+          <p class="form-note" style="margin-top:8px;">Zoom или звонок. Выбираете удобное время.</p>
+          <div class="cta-channels">
+            <a href="https://t.me/medsprint" target="_blank" class="cta-channel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+              Telegram
+            </a>
+            <a href="https://wa.me/74951234567" target="_blank" class="cta-channel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+              WhatsApp
+            </a>
+            <a href="tel:+74951234567" class="cta-channel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013 5.07 2 2 0 015 2.86h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L9.09 10a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+              Позвонить
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="navbar-logo" style="margin-bottom:12px;">
+          <div class="navbar-logo-icon">М</div>
+          МедСпринт
+          <span class="logo-geo-tag">GEO</span>
+        </div>
+        <p>Единственное агентство в России, специализирующееся на GEO-продвижении медицинских клиник в ответах ИИ-поисковиков.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Услуги</h4>
+        <a href="#services">GEO-аудит</a>
+        <a href="#services">Контент для ИИ</a>
+        <a href="#services">Технический GEO</a>
+        <a href="#services">E-E-A-T усиление</a>
+        <a href="https://medsprint.ru">Все услуги →</a>
+      </div>
+      <div class="footer-col">
+        <h4>Компания</h4>
+        <a href="#team">О команде</a>
+        <a href="#cases">Кейсы</a>
+        <a href="#reviews">Отзывы</a>
+        <a href="https://medsprint.ru">МедСпринт</a>
+      </div>
+      <div class="footer-col">
+        <h4>Контакты</h4>
+        <a href="tel:+74951234567">+7 (495) 123-45-67</a>
+        <a href="mailto:geo@medsprint.ru">geo@medsprint.ru</a>
+        <a href="https://t.me/medsprint" target="_blank">Telegram</a>
+        <a href="https://wa.me/74951234567" target="_blank">WhatsApp</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© МедСпринт, 2026. Все права защищены.</span>
+      <span>
+        <a href="#">Политика конфиденциальности</a> &nbsp;·&nbsp;
+        <a href="#">Договор оферты</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════ SCRIPTS ══════════════════ -->
+<script>
+  // ─── Word Rotation ───
+  const words = ['ChatGPT', 'Яндекс Нейро', 'Perplexity', 'Google AI', 'Grok'];
+  let wordIdx = 0;
+  const el = document.getElementById('rotatingWord');
+  setInterval(() => {
+    el.classList.add('fade-out');
+    setTimeout(() => {
+      wordIdx = (wordIdx + 1) % words.length;
+      el.textContent = words[wordIdx];
+      el.classList.remove('fade-out');
+    }, 300);
+  }, 2600);
+
+  // ─── Scroll Reveal ───
+  const revealEls = document.querySelectorAll('.reveal');
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        revealObs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  revealEls.forEach(el => revealObs.observe(el));
+
+  // ─── CountUp ───
+  const counters = document.querySelectorAll('.count');
+  const countObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const target = +el.dataset.target;
+      const duration = 1800;
+      const step = target / (duration / 16);
+      let current = 0;
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) { el.textContent = target; clearInterval(timer); return; }
+        el.textContent = Math.floor(current);
+      }, 16);
+      countObs.unobserve(el);
+    });
+  }, { threshold: 0.5 });
+  counters.forEach(c => countObs.observe(c));
+
+  // ─── FAQ Accordion ───
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // ─── Form handler ───
+  function handleForm(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button[type=submit]');
+    btn.textContent = '✓ Заявка отправлена! Ответим в рабочий день.';
+    btn.style.background = 'var(--success)';
+    btn.style.boxShadow = '0 0 24px rgba(16,185,129,0.4)';
+    btn.disabled = true;
+  }
+
+  // ─── Navbar scroll effect ───
+  const navbar = document.querySelector('.navbar');
+  window.addEventListener('scroll', () => {
+    navbar.style.background = window.scrollY > 50
+      ? 'rgba(6,8,16,0.97)'
+      : 'rgba(6,8,16,0.85)';
+  }, { passive: true });
+</script>
+
+</body>
+</html>
